@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>JS Drum Kit</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 
@@ -57,10 +59,39 @@
   <audio data-key="75" src="sounds/tom.wav"></audio>
   <audio data-key="76" src="sounds/tink.wav"></audio>
 
-<script>
+  <script>
+    // 第一步在整個視窗(window)監聽keydown事件，令常數audio對文件內符合按鍵參數(e)的audio物件(52~60行)。
+    window.addEventListener('keydown', function (e) {
+      const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+      // 第二步令常數key對符合按鍵參數(e)的div物件(13行內)，若該參數audio存在((!aidio)為true，audio有抓到div也會抓到)就執行return。
+      const key = document.querySelector(`div[data-key="${e.keyCode}"]`);
+      // console.log(audio);
+      if (!audio) return;
 
-</script>
+      // 第三步對return出來的key(div物件)增加一個class'playing'(css已設定好的樣式)，設定audio播放位置為0秒並撥放。
+      key.classList.add('playing');
+      audio.currentTime = 0;
+      audio.play();
+    })
+
+    // 第四步要修正點擊對應音效鍵後變固定住的css效果，新增一個常數keys抓出所有含有.key的文件內容成為陣列，
+    // 並將陣列內發生了tansitionend的所有物件去執行(forEach)removeTransition。
+    const keys = document.querySelectorAll('.key');
+    keys.forEach(function (key) {
+      key.addEventListener('transitionend', removeTransition)
+    });
+
+    // 最後一步設定函數removeTransition，若propertyName(transition結束後回傳的內容，可用console.log(e)檢視)無transform的參數忽略，
+    // 將參數(e)移除掉'playing'的class。
+    function removeTransition(e) {
+      // console.log(e);
+      if (e.propertyName !== 'transform') return;
+      this.classList.remove('playing');
+    };
+  </script>
+
 
 
 </body>
+
 </html>
