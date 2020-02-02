@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Type Ahead 👀</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <form class="search-form">
@@ -14,9 +16,53 @@
       <li>or a state</li>
     </ul>
   </form>
-<script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
 
-</script>
+  <script>
+    const endpoint =
+      'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+
+    const cities = [];
+    fetch(endpoint)
+      .then(function (blob) {
+        return blob.json()
+      })
+      .then(function (data) {
+        return cities.push(...data)
+      });
+
+    function findData(myValue) {
+      return cities.filter(place => {
+        const keyText = new RegExp(myValue, 'gi');
+        return place.city.match(keyText) || place.state.match(keyText)
+      });
+    }
+
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    function Handler() {
+      const mySearchText = findData(this.value);
+      const html = mySearchText.map(place => {
+        const keyText = new RegExp(this.value, 'gi');
+        const cityName = place.city.replace(keyText, `<span class="hl">${this.value}</span>`);
+        const stateName = place.state.replace(keyText, `<span class="hl">${this.value}</span>`);
+        return `
+          <li>
+            <span class="name">${cityName}, ${stateName}</span>
+            <span class="population">${numberWithCommas(place.population)}</span>
+          </li>
+        `;
+      }).join('');
+      suggestions.innerHTML = html
+    }
+
+    const searchInput = document.querySelector('.search');
+    const suggestions = document.querySelector('.suggestions');
+
+    searchInput.addEventListener('change', Handler)
+    searchInput.addEventListener('keyup', Handler)
+  </script>
 </body>
+
 </html>
